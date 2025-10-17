@@ -1,16 +1,86 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    tools:context=".ui.diary.DiaryFragment">
 
-    <TextView
-        android:layout_width="wrap_content"
+    <com.google.android.material.button.MaterialButtonToggleGroup
+        android:id="@+id/toggle_button_group_filter"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="Fragment del Diari"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:singleSelection="true">
+
+        <Button
+            android:id="@+id/button_all"
+            style="@style/GachaJournal.GameButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Tots" />
+
+        <Button
+            android:id="@+id/button_genshin_filter"
+            style="@style/GachaJournal.GameButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Genshin" />
+
+        <Button
+            android:id="@+id/button_star_rail_filter"
+            style="@style/GachaJournal.GameButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Star Rail" />
+
+        <Button
+            android:id="@+id/button_zzz_filter"
+            style="@style/GachaJournal.GameButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="ZZZ" />
+
+    </com.google.android.material.button.MaterialButtonToggleGroup>
+
+    <Button
+        android:id="@+id/button_open_calendar"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="Seleccionar Data"
+        app:layout_constraintEnd_toEndOf="@+id/toggle_button_group_filter"
+        app:layout_constraintStart_toStartOf="@+id/toggle_button_group_filter"
+        app:layout_constraintTop_toBottomOf="@+id/toggle_button_group_filter" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recycler_view_entries"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="8dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/button_open_calendar" />
+
+    <TextView
+        android:id="@+id/text_no_entries"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="No hi ha entrades per a aquest dia."
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@+id/recycler_view_entries"
+        app:layout_constraintEnd_toEndOf="@+id/recycler_view_entries"
+        app:layout_constraintStart_toStartOf="@+id/recycler_view_entries"
+        app:layout_constraintTop_toTopOf="@+id/recycler_view_entries" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -3,6 +3,8 @@ package com.example.gachajournal.data.database
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
+import androidx.room.Query
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface JournalEntryDao {
@@ -10,5 +12,6 @@ interface JournalEntryDao {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insert(entry: JournalEntry)
     
-    // TODO: Add methods to query entries (e.g., get all, get by date)
+    @Query("SELECT * FROM journal_entries ORDER BY date DESC")
+    fun getAllEntries(): Flow<List<JournalEntry>>
 }

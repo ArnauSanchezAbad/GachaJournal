@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">Gacha Journal</string>
+    <string name="title_diary">Diari</string>
+    <string name="title_gacha">Gacha</string>
+    <string name="title_shop">Botiga</string>
+    <string name="title_profile">Perfil</string>
+    <string name="title_new_entry">Nova Entrada</string>
+</resources>

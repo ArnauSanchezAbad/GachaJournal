@@ -7,15 +7,14 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.applandeo.materialcalendarview.EventDay
+import com.applandeo.materialcalendarview.listeners.OnDayClickListener
 import com.example.gachajournal.R
 import com.example.gachajournal.data.JournalRepository
 import com.example.gachajournal.data.database.AppDatabase
 import com.example.gachajournal.data.database.JournalEntry
 import com.example.gachajournal.databinding.FragmentDiaryBinding
-import com.google.android.material.datepicker.MaterialDatePicker
-import java.time.Instant
-import java.time.ZoneId
-import java.util.Date
+import java.util.Calendar
 
 class DiaryFragment : Fragment() {
 
@@ -28,7 +27,6 @@ class DiaryFragment : Fragment() {
 
     private val journalAdapter = JournalEntryAdapter()
     private var allEntries = emptyList<JournalEntry>()
-    private var selectedDate: Date = Date() // Today by default
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
@@ -45,44 +43,46 @@ class DiaryFragment : Fragment() {
             adapter = journalAdapter
         }
 
-        binding.buttonOpenCalendar.setOnClickListener { showCalendar() }
-
+        setupCalendar()
         setupFilter()
 
         viewModel.allEntries.observe(viewLifecycleOwner) {
             allEntries = it
-            updateEntriesForSelectedDate()
+            updateCalendarEvents()
+            updateEntriesForSelectedDate(binding.calendarView.selectedDates.firstOrNull())
         }
-
-        updateEntriesForSelectedDate() // Initial load for today
     }
 
     private fun setupFilter() {
         binding.toggleButtonGroupFilter.addOnButtonCheckedListener { _, _, isChecked ->
             if (isChecked) {
-                updateEntriesForSelectedDate()
+                updateCalendarEvents()
+                updateEntriesForSelectedDate(binding.calendarView.selectedDates.firstOrNull())
             }
         }
         binding.toggleButtonGroupFilter.check(R.id.button_all)
     }
 
-    private fun showCalendar() {
-        val datePicker = MaterialDatePicker.Builder.datePicker()
-            .setTitleText("Selecciona una data")
-            .setSelection(selectedDate.time)
-            .build()
+    private fun setupCalendar() {
+        binding.calendarView.setOnDayClickListener(object : OnDayClickListener {
+            override fun onDayClick(eventDay: EventDay) {
+                updateEntriesForSelectedDate(eventDay.calendar)
+            }
+        })
+    }
 
-        datePicker.addOnPositiveButtonClickListener { selection ->
-            selectedDate = Date(selection)
-            updateEntriesForSelectedDate()
+    private fun updateCalendarEvents() {
+        val datesWithEntries = getFilteredEntries().map {
+            val calendar = Calendar.getInstance()
+            calendar.timeInMillis = it.date
+            EventDay(calendar, R.drawable.ic_dot)
         }
-
-        datePicker.show(parentFragmentManager, "DATE_PICKER")
+        binding.calendarView.setEvents(datesWithEntries)
     }
 
     private fun getFilteredEntries(): List<JournalEntry> {
         val selectedGameId = binding.toggleButtonGroupFilter.checkedButtonId
-        if (selectedGameId == R.id.button_all) {
+        if (selectedGameId == R.id.button_all || selectedGameId == -1) {
             return allEntries
         }
         val selectedGame = when (selectedGameId) {
@@ -94,11 +94,13 @@ class DiaryFragment : Fragment() {
         return allEntries.filter { it.game == selectedGame }
     }
 
-    private fun updateEntriesForSelectedDate() {
+    private fun updateEntriesForSelectedDate(selectedCalendar: Calendar?) {
+        val calendar = selectedCalendar ?: return
+
         val entriesForDay = getFilteredEntries().filter {
-            val entryDate = Instant.ofEpochMilli(it.date).atZone(ZoneId.systemDefault()).toLocalDate()
-            val selectedLocalDate = Instant.ofEpochMilli(selectedDate.time).atZone(ZoneId.systemDefault()).toLocalDate()
-            entryDate == selectedLocalDate
+            val entryCalendar = Calendar.getInstance().apply { timeInMillis = it.date }
+            entryCalendar.get(Calendar.YEAR) == calendar.get(Calendar.YEAR) &&
+            entryCalendar.get(Calendar.DAY_OF_YEAR) == calendar.get(Calendar.DAY_OF_YEAR)
         }
 
         if (entriesForDay.isEmpty()) {

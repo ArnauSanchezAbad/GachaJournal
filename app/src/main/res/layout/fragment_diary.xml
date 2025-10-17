@@ -52,12 +52,14 @@
 
     </com.google.android.material.button.MaterialButtonToggleGroup>
 
-    <Button
-        android:id="@+id/button_open_calendar"
+    <com.applandeo.materialcalendarview.CalendarView
+        android:id="@+id/calendar_view"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
-        android:text="Seleccionar Data"
+        app:headerColor="@color/deep_purple"
+        app:todayLabelColor="@color/purple_500"
+        app:selectionColor="@color/purple_200"
         app:layout_constraintEnd_toEndOf="@+id/toggle_button_group_filter"
         app:layout_constraintStart_toStartOf="@+id/toggle_button_group_filter"
         app:layout_constraintTop_toBottomOf="@+id/toggle_button_group_filter" />
@@ -70,7 +72,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/button_open_calendar" />
+        app:layout_constraintTop_toBottomOf="@+id/calendar_view" />
 
     <TextView
         android:id="@+id/text_no_entries"
@@ -81,6 +83,6 @@
         app:layout_constraintBottom_toBottomOf="@+id/recycler_view_entries"
         app:layout_constraintEnd_toEndOf="@+id/recycler_view_entries"
         app:layout_constraintStart_toStartOf="@+id/recycler_view_entries"
-        app:layout_constraintTop_toTopOf="@+id/recycler_view_entries" />
+        app:layout_constraintTop_toTopOf="@id/recycler_view_entries" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

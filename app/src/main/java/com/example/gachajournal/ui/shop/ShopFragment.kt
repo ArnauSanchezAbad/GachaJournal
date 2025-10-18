@@ -12,6 +12,8 @@ import androidx.lifecycle.lifecycleScope
 import com.example.gachajournal.data.JournalRepository
 import com.example.gachajournal.data.database.AppDatabase
 import com.example.gachajournal.databinding.FragmentShopBinding
+import com.example.gachajournal.ui.MainViewModel
+import com.example.gachajournal.ui.MainViewModelFactory
 import kotlinx.coroutines.launch
 
 class ShopFragment : Fragment() {
@@ -20,6 +22,7 @@ class ShopFragment : Fragment() {
     private val binding get() = _binding!!
 
     private lateinit var viewModel: ShopViewModel
+    private lateinit var mainViewModel: MainViewModel
     private lateinit var shopAdapter: ShopAdapter
 
     override fun onCreateView(
@@ -36,8 +39,14 @@ class ShopFragment : Fragment() {
 
         val database = AppDatabase.getDatabase(requireContext())
         val repository = JournalRepository(database.journalEntryDao(), database.userDao())
+        
+        // Init ShopViewModel (Fragment-scoped)
         val factory = ShopViewModelFactory(repository)
         viewModel = ViewModelProvider(this, factory)[ShopViewModel::class.java]
+
+        // Init MainViewModel (Activity-scoped)
+        val mainFactory = MainViewModelFactory(repository)
+        mainViewModel = ViewModelProvider(requireActivity(), mainFactory)[MainViewModel::class.java]
 
         shopAdapter = ShopAdapter { shopItem ->
             viewModel.purchaseItem(shopItem.cosmetic)
@@ -50,6 +59,12 @@ class ShopFragment : Fragment() {
                 binding.progressBar.isVisible = state.isLoading
                 binding.recyclerViewShop.isVisible = !state.isLoading
                 shopAdapter.submitList(state.items)
+            }
+        }
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            mainViewModel.appTheme.collect { theme ->
+                shopAdapter.updateTheme(theme)
             }
         }
 

@@ -11,6 +11,7 @@ import androidx.navigation.ui.setupWithNavController
 import com.example.gachajournal.data.JournalRepository
 import com.example.gachajournal.data.database.AppDatabase
 import com.example.gachajournal.databinding.ActivityMainBinding
+import com.example.gachajournal.ui.AppTheme
 import com.example.gachajournal.ui.MainViewModel
 import com.example.gachajournal.ui.MainViewModelFactory
 import com.google.android.material.bottomnavigation.BottomNavigationView
@@ -42,13 +43,7 @@ class MainActivity : AppCompatActivity() {
 
         lifecycleScope.launch {
             viewModel.appTheme.collect { theme ->
-                // Apply background color
-                val color = try {
-                    theme.backgroundColor?.let { Color.parseColor(it) } ?: Color.TRANSPARENT
-                } catch (e: IllegalArgumentException) {
-                    Color.TRANSPARENT
-                }
-                binding.container.setBackgroundColor(color)
+                applyDynamicTheme(theme)
             }
         }
 
@@ -68,5 +63,12 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
+    }
+
+    private fun applyDynamicTheme(theme: AppTheme) {
+        val bgColor = try {
+            theme.backgroundColor?.let { Color.parseColor(it) } ?: Color.TRANSPARENT
+        } catch (e: Exception) { Color.TRANSPARENT }
+        binding.root.setBackgroundColor(bgColor)
     }
 }

@@ -7,11 +7,14 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.example.gachajournal.data.JournalRepository
 import com.example.gachajournal.data.database.AppDatabase
 import com.example.gachajournal.databinding.FragmentProfileBinding
+import com.example.gachajournal.ui.MainViewModel
+import com.example.gachajournal.ui.MainViewModelFactory
 import kotlinx.coroutines.launch
 
 class ProfileFragment : Fragment() {
@@ -20,6 +23,11 @@ class ProfileFragment : Fragment() {
     private val binding get() = _binding!!
 
     private lateinit var viewModel: ProfileViewModel
+    private val mainViewModel: MainViewModel by activityViewModels {
+        val database = AppDatabase.getDatabase(requireContext())
+        val repository = JournalRepository(database.journalEntryDao(), database.userDao())
+        MainViewModelFactory(repository)
+    }
     private lateinit var profileAdapter: ProfileAdapter
 
     override fun onCreateView(
@@ -50,6 +58,12 @@ class ProfileFragment : Fragment() {
                 binding.progressBar.isVisible = state.isLoading
                 binding.recyclerViewProfile.isVisible = !state.isLoading
                 profileAdapter.submitList(state.optionsByType)
+            }
+        }
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            mainViewModel.appTheme.collect { theme ->
+                profileAdapter.updateTheme(theme)
             }
         }
     }

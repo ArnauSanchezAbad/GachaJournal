@@ -1,10 +1,13 @@
 package com.example.gachajournal.ui.profile
 
+import android.graphics.Color
+import android.graphics.drawable.GradientDrawable
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.gachajournal.databinding.ItemProfileHeaderBinding
 import com.example.gachajournal.databinding.ItemProfileOptionBinding
+import com.example.gachajournal.ui.AppTheme
 
 sealed class ProfileRecyclerViewItem {
     data class Header(val title: String) : ProfileRecyclerViewItem()
@@ -15,10 +18,16 @@ class ProfileAdapter(private val onActionClick: (ProfileOption) -> Unit) :
     RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     private var items = listOf<ProfileRecyclerViewItem>()
+    private var currentTheme: AppTheme? = null
 
     companion object {
         private const val VIEW_TYPE_HEADER = 0
         private const val VIEW_TYPE_OPTION = 1
+    }
+
+    fun updateTheme(theme: AppTheme) {
+        currentTheme = theme
+        notifyDataSetChanged()
     }
 
     fun submitList(optionsByType: Map<String, List<ProfileOption>>) {
@@ -51,8 +60,8 @@ class ProfileAdapter(private val onActionClick: (ProfileOption) -> Unit) :
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         when (val item = items[position]) {
-            is ProfileRecyclerViewItem.Header -> (holder as HeaderViewHolder).bind(item)
-            is ProfileRecyclerViewItem.Option -> (holder as OptionViewHolder).bind(item)
+            is ProfileRecyclerViewItem.Header -> (holder as HeaderViewHolder).bind(item, currentTheme)
+            is ProfileRecyclerViewItem.Option -> (holder as OptionViewHolder).bind(item, currentTheme)
         }
     }
 
@@ -60,17 +69,64 @@ class ProfileAdapter(private val onActionClick: (ProfileOption) -> Unit) :
 
     inner class HeaderViewHolder(private val binding: ItemProfileHeaderBinding) :
         RecyclerView.ViewHolder(binding.root) {
-        fun bind(header: ProfileRecyclerViewItem.Header) {
+
+        private val defaultColor = binding.textHeader.currentTextColor
+        
+        fun bind(header: ProfileRecyclerViewItem.Header, theme: AppTheme?) {
             binding.textHeader.text = header.title
+
+            // Apply font color
+            theme?.fontColor?.let {
+                try {
+                    binding.textHeader.setTextColor(Color.parseColor(it))
+                } catch (e: Exception) {
+                    binding.textHeader.setTextColor(defaultColor)
+                }
+            } ?: run {
+                binding.textHeader.setTextColor(defaultColor)
+            }
         }
     }
 
     inner class OptionViewHolder(private val binding: ItemProfileOptionBinding) :
         RecyclerView.ViewHolder(binding.root) {
-        fun bind(optionItem: ProfileRecyclerViewItem.Option) {
+
+        private val defaultColor = binding.textOptionName.currentTextColor
+
+        fun bind(optionItem: ProfileRecyclerViewItem.Option, theme: AppTheme?) {
             val option = optionItem.profileOption
             binding.textOptionName.text = option.cosmetic.name
 
+            // Apply border
+            theme?.borderColor?.let {
+                try {
+                    val borderColor = Color.parseColor(it)
+                    val borderDrawable = GradientDrawable().apply {
+                        shape = GradientDrawable.RECTANGLE
+                        setStroke(8, borderColor)
+                        cornerRadius = 16f
+                    }
+                    binding.root.background = borderDrawable
+                } catch (e: Exception) {
+                    binding.root.background = null
+                }
+            } ?: run {
+                binding.root.background = null
+            }
+
+            // Apply font color
+            theme?.fontColor?.let {
+                try {
+                    val fontColor = Color.parseColor(it)
+                    binding.textOptionName.setTextColor(fontColor)
+                } catch (e: Exception) {
+                    binding.textOptionName.setTextColor(defaultColor)
+                }
+            } ?: run {
+                binding.textOptionName.setTextColor(defaultColor)
+            }
+
+            // Set button state
             binding.buttonAction.isEnabled = option.isOwned
             binding.buttonAction.text = when {
                 option.isEquipped -> "Equipped"

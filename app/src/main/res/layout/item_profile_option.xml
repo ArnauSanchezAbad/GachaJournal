@@ -7,16 +7,16 @@
     android:paddingStart="16dp"
     android:paddingEnd="16dp"
     android:paddingTop="8dp"
-    android:paddingBottom="8dp">
+    android:paddingBottom="8dp"
+    style="?attr/themedCardViewStyle">
 
     <TextView
         android:id="@+id/text_option_name"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:textSize="16sp"
+        android:textSize="18sp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/button_action"
         tools:text="Option Name" />
 
@@ -24,10 +24,9 @@
         android:id="@+id/button_action"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        style="?attr/materialButtonOutlinedStyle"
+        android:text="Equip"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        tools:text="Equip" />
+        app:layout_constraintBottom_toBottomOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

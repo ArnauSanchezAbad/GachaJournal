@@ -8,6 +8,7 @@ import com.example.gachajournal.data.database.UserCosmeticCrossRef
 import com.example.gachajournal.data.database.UserDao
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
 
 class JournalRepository(private val journalEntryDao: JournalEntryDao, private val userDao: UserDao) {
 
@@ -15,6 +16,32 @@ class JournalRepository(private val journalEntryDao: JournalEntryDao, private va
     val user: Flow<User?> = userDao.getUser()
     val cosmetics: Flow<List<Cosmetic>> = userDao.getAllCosmetics()
     val userWithCosmetics = userDao.getUserWithCosmetics()
+
+    fun getOwnedCosmetics(): Flow<List<Cosmetic>> {
+        return userWithCosmetics.map { it?.cosmetics ?: emptyList() }
+    }
+
+    suspend fun equipCosmetic(cosmetic: Cosmetic, userId: Long = 1) {
+        val user = userDao.getUserById(userId) ?: return
+        val updatedUser = when (cosmetic.type) {
+            "BACKGROUND" -> user.copy(equippedBackgroundId = if (cosmetic.id == 1L) null else cosmetic.id)
+            "BORDER" -> user.copy(equippedBorderId = if (cosmetic.id == 2L) null else cosmetic.id)
+            "FONT_COLOR" -> user.copy(equippedFontColorId = if (cosmetic.id == 3L) null else cosmetic.id)
+            else -> user
+        }
+        userDao.updateUser(updatedUser)
+    }
+
+    suspend fun purchaseCosmetic(cosmetic: Cosmetic, userId: Long = 1): Boolean {
+        val user = userDao.getUserById(userId) ?: return false
+        if (user.gachaPoints >= cosmetic.price) {
+            val updatedUser = user.copy(gachaPoints = user.gachaPoints - cosmetic.price)
+            userDao.updateUser(updatedUser)
+            userDao.addUserCosmetic(UserCosmeticCrossRef(userId, cosmetic.id))
+            return true
+        }
+        return false
+    }
 
     suspend fun insertEntryAndGetReward(entry: JournalEntry): Reward {
         var user = userDao.getUser().first()
@@ -38,7 +65,7 @@ class JournalRepository(private val journalEntryDao: JournalEntryDao, private va
     }
 
     suspend fun performGachaRoll(userId: Long = 1, cost: Int): Cosmetic? {
-        val user = userDao.getUser().first() ?: return null
+        val user = userDao.getUserById(userId) ?: return null
         if (user.gachaPoints < cost) return null
 
         val allCosmetics = cosmetics.first()

@@ -12,5 +12,10 @@ data class User(
     val entriesSinceLast5Star: Int = 0,
     // Pity for cosmetic gacha
     val gachaRollsSinceLast4Star: Int = 0,
-    val gachaRollsSinceLast5Star: Int = 0
+    val gachaRollsSinceLast5Star: Int = 0,
+
+    // Equipped Cosmetics
+    val equippedBackgroundId: Long? = null,
+    val equippedBorderId: Long? = null,
+    val equippedFontColorId: Long? = null
 )

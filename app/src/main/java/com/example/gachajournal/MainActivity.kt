@@ -1,16 +1,29 @@
 package com.example.gachajournal
 
+import android.graphics.Color
 import android.os.Bundle
 import android.view.View
-import com.google.android.material.bottomnavigation.BottomNavigationView
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
 import androidx.navigation.ui.setupWithNavController
+import com.example.gachajournal.data.JournalRepository
+import com.example.gachajournal.data.database.AppDatabase
 import com.example.gachajournal.databinding.ActivityMainBinding
+import com.example.gachajournal.ui.MainViewModel
+import com.example.gachajournal.ui.MainViewModelFactory
+import com.google.android.material.bottomnavigation.BottomNavigationView
+import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
+    private val viewModel: MainViewModel by viewModels {
+        val database = AppDatabase.getDatabase(this)
+        val repository = JournalRepository(database.journalEntryDao(), database.userDao())
+        MainViewModelFactory(repository)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -27,7 +40,19 @@ class MainActivity : AppCompatActivity() {
             navController.navigate(R.id.navigation_new_entry)
         }
 
-        // Amaguem/mostrem la barra de navegació segons la pantalla
+        lifecycleScope.launch {
+            viewModel.appTheme.collect { theme ->
+                // Apply background color
+                val color = try {
+                    theme.backgroundColor?.let { Color.parseColor(it) } ?: Color.TRANSPARENT
+                } catch (e: IllegalArgumentException) {
+                    Color.TRANSPARENT
+                }
+                binding.container.setBackgroundColor(color)
+            }
+        }
+
+        // Show/Hide bottom nav based on destination
         navController.addOnDestinationChangedListener { _, destination, _ ->
             when (destination.id) {
                 R.id.navigation_diary,

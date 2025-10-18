@@ -1,7 +1,6 @@
 package com.example.gachajournal.ui.gacha
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.gachajournal.data.JournalRepository
 import com.example.gachajournal.data.database.Cosmetic
@@ -10,7 +9,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -74,15 +72,5 @@ class GachaViewModel(private val repository: JournalRepository) : ViewModel() {
             _isRolling.value = false
             _showResult.value = true
         }
-    }
-}
-
-class GachaViewModelFactory(private val repository: JournalRepository) : ViewModelProvider.Factory {
-    override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        if (modelClass.isAssignableFrom(GachaViewModel::class.java)) {
-            @Suppress("UNCHECKED_CAST")
-            return GachaViewModel(repository) as T
-        }
-        throw IllegalArgumentException("Unknown ViewModel class")
     }
 }

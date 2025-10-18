@@ -9,7 +9,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-@Database(entities = [JournalEntry::class, User::class, Cosmetic::class, UserCosmeticCrossRef::class], version = 2, exportSchema = false)
+@Database(entities = [JournalEntry::class, User::class, Cosmetic::class, UserCosmeticCrossRef::class], version = 3, exportSchema = false)
 abstract class AppDatabase : RoomDatabase() {
 
     abstract fun journalEntryDao(): JournalEntryDao

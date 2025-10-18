@@ -9,8 +9,9 @@ import coil.load
 import com.example.gachajournal.R
 import com.example.gachajournal.data.database.JournalEntry
 import com.example.gachajournal.databinding.EntryListItemBinding
+import java.io.File
 
-class JournalEntryAdapter : ListAdapter<JournalEntry, JournalEntryAdapter.JournalEntryViewHolder>(DiffCallback) {
+class JournalEntryAdapter(private val onDeleteClicked: (JournalEntry) -> Unit) : ListAdapter<JournalEntry, JournalEntryAdapter.JournalEntryViewHolder>(DiffCallback) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): JournalEntryViewHolder {
         val binding = EntryListItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
@@ -19,19 +20,29 @@ class JournalEntryAdapter : ListAdapter<JournalEntry, JournalEntryAdapter.Journa
 
     override fun onBindViewHolder(holder: JournalEntryViewHolder, position: Int) {
         val current = getItem(position)
-        holder.bind(current)
+        holder.itemView.setOnClickListener { 
+            // TODO: Add click listener to view full entry
+        }
+        holder.bind(current, onDeleteClicked)
     }
 
     class JournalEntryViewHolder(private val binding: EntryListItemBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(entry: JournalEntry) {
+        fun bind(entry: JournalEntry, onDeleteClicked: (JournalEntry) -> Unit) {
             binding.entryGameTitle.text = entry.game
             binding.entryDescription.text = entry.description
-            binding.entryImage.load(entry.imageUri) {
-                crossfade(true)
-                placeholder(R.drawable.ic_launcher_background) // Provisional placeholder
+            
+            entry.imageUri?.let {
+                binding.entryImage.load(File(it)) {
+                    crossfade(true)
+                    placeholder(R.drawable.ic_launcher_background)
+                }
+            } ?: run {
+                binding.entryImage.setImageResource(R.drawable.ic_launcher_background)
             }
+
+            binding.buttonDelete.setOnClickListener { onDeleteClicked(entry) }
         }
     }
 

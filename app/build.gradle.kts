@@ -36,6 +36,10 @@ android {
     }
     buildFeatures {
         viewBinding = true
+        compose = true // Enable Compose
+    }
+    composeOptions {
+        kotlinCompilerExtensionVersion = "1.5.11" // The correct version for Kotlin 1.9.23
     }
 }
 
@@ -54,6 +58,13 @@ dependencies {
     implementation(libs.kotlinx.coroutines.android)
     implementation(libs.applandeo.calendar)
     implementation(libs.coil)
+
+    // Jetpack Compose
+    implementation(platform("androidx.compose:compose-bom:2024.04.01"))
+    implementation("androidx.compose.ui:ui")
+    implementation("androidx.compose.ui:ui-graphics")
+    implementation("androidx.compose.ui:ui-tooling-preview")
+    implementation("androidx.compose.material3:material3")
     
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

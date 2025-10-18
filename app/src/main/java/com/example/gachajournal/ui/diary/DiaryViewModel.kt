@@ -3,11 +3,18 @@ package com.example.gachajournal.ui.diary
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.asLiveData
+import androidx.lifecycle.viewModelScope
 import com.example.gachajournal.data.JournalRepository
+import com.example.gachajournal.data.database.JournalEntry
+import kotlinx.coroutines.launch
 
 class DiaryViewModel(private val repository: JournalRepository) : ViewModel() {
 
     val allEntries = repository.allEntries.asLiveData()
+
+    fun delete(entry: JournalEntry) = viewModelScope.launch {
+        repository.delete(entry)
+    }
 
 }
 

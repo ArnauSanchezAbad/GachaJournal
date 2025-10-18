@@ -4,15 +4,16 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/dark_purple"
-    tools:context=".ui.newentry.NewEntryFragment">
+    android:fillViewport="true">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="16dp">
+        android:padding="16dp"
+        tools:context=".ui.newentry.NewEntryFragment">
 
-        <!-- Header -->
+        <!-- All the other views -->
+
         <ImageButton
             android:id="@+id/button_back"
             android:layout_width="wrap_content"
@@ -20,8 +21,7 @@
             android:background="?attr/selectableItemBackgroundBorderless"
             android:src="@drawable/ic_arrow_back"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/title_new_entry"
-            app:layout_constraintBottom_toBottomOf="@+id/title_new_entry" />
+            app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
             android:id="@+id/title_new_entry"
@@ -29,129 +29,144 @@
             android:layout_height="wrap_content"
             android:text="Nova Entrada"
             android:textSize="24sp"
-            app:layout_constraintStart_toEndOf="@+id/button_back"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <Button
-            android:id="@+id/button_save"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Guardar"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="@+id/button_back"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <!-- Date Field -->
-        <TextView
-            android:id="@+id/label_date"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
-            android:text="Data de l'entrada"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/title_new_entry" />
+            app:layout_constraintTop_toTopOf="@+id/button_back" />
 
-        <EditText
-            android:id="@+id/input_date"
-            style="@style/GachaJournal.EditText"
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/input_layout_date"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:focusable="false"
-            android:hint="16/10/2025"
+            android:layout_marginTop="16dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/label_date" />
+            app:layout_constraintTop_toBottomOf="@+id/title_new_entry">
 
-        <!-- Game Selection -->
-        <TextView
-            android:id="@+id/label_game"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:text="Joc"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/input_date" />
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/input_date"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:focusable="false"
+                android:hint="Data" />
+        </com.google.android.material.textfield.TextInputLayout>
 
         <com.google.android.material.button.MaterialButtonToggleGroup
             android:id="@+id/toggle_button_group_game"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            app:singleSelection="true"
-            app:layout_constraintStart_toStartOf="parent"
+            android:layout_marginTop="8dp"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/label_game">
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/input_layout_date"
+            app:singleSelection="true">
 
             <Button
                 android:id="@+id/button_genshin"
                 style="@style/GachaJournal.GameButton"
                 android:layout_width="0dp"
-                android:layout_weight="1"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:text="Genshin" />
 
             <Button
                 android:id="@+id/button_star_rail"
                 style="@style/GachaJournal.GameButton"
                 android:layout_width="0dp"
-                android:layout_weight="1"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:text="Star Rail" />
 
             <Button
                 android:id="@+id/button_zzz"
                 style="@style/GachaJournal.GameButton"
                 android:layout_width="0dp"
-                android:layout_weight="1"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:text="ZZZ" />
 
         </com.google.android.material.button.MaterialButtonToggleGroup>
 
-        <!-- Image Field -->
-        <TextView
-            android:id="@+id/label_image"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+        <ImageView
+            android:id="@+id/image_preview"
+            android:layout_width="120dp"
+            android:layout_height="120dp"
             android:layout_marginTop="16dp"
-            android:text="Captura de tu tirada"
+            android:background="#3A1F56"
+            android:scaleType="centerCrop"
+            android:src="@drawable/ic_add_a_photo"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/toggle_button_group_game" />
 
-        <ImageView
-            android:id="@+id/image_preview"
-            style="@style/GachaJournal.ImageView"
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/input_layout_feelings"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="0dp"
-            android:layout_height="200dp"
-            android:layout_marginTop="8dp"
-            android:contentDescription="Toca per seleccionar imatge"
-            android:scaleType="centerInside"
-            android:src="@android:drawable/ic_menu_gallery"
+            android:layout_height="0dp"
+            android:layout_marginStart="16dp"
+            app:layout_constraintBottom_toBottomOf="@+id/image_preview"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/label_image" />
+            app:layout_constraintStart_toEndOf="@+id/image_preview"
+            app:layout_constraintTop_toTopOf="@+id/image_preview">
 
-        <!-- Feelings Field -->
-        <TextView
-            android:id="@+id/label_feelings"
-            android:layout_width="wrap_content"
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/input_feelings"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="top"
+                android:hint="Què ha passat?" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/card_reward_info"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:text="Com et sents?"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/image_preview" />
-
-        <EditText
-            android:id="@+id/input_feelings"
-            style="@style/GachaJournal.EditText"
-            android:layout_width="0dp"
-            android:layout_height="100dp"
-            android:layout_marginTop="8dp"
-            android:gravity="top"
-            android:hint="Escriu sobre la teva experiència..."
-            android:inputType="textMultiLine"
+            app:cardBackgroundColor="#3A1F56"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/label_feelings" />
+            app:layout_constraintTop_toBottomOf="@+id/image_preview">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Recompensa Assegurada"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/text_pity_5_star"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    tools:text="⭐⭐⭐⭐⭐ Assegurat en 50 entrades" />
+
+                <TextView
+                    android:id="@+id/text_pity_4_star"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    tools:text="⭐⭐⭐⭐ Assegurat en 10 entrades" />
+
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <Button
+            android:id="@+id/button_save"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:padding="16dp"
+            android:text="Guardar Entrada i Rebre Recompensa"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/card_reward_info"
+            app:layout_constraintVertical_bias="1.0" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>

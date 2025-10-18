@@ -28,7 +28,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:textStyle="bold"
-            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/button_delete"
             app:layout_constraintStart_toEndOf="@+id/entry_image"
             app:layout_constraintTop_toTopOf="@+id/entry_image"
             tools:text="Genshin Impact" />
@@ -43,6 +43,15 @@
             app:layout_constraintStart_toStartOf="@id/entry_game_title"
             app:layout_constraintTop_toBottomOf="@+id/entry_game_title"
             tools:text="M'ha sortit el personatge que volia, estic molt content!" />
+
+        <ImageButton
+            android:id="@+id/button_delete"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@drawable/ic_delete"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

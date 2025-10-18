@@ -1,6 +1,8 @@
 package com.example.gachajournal.ui.newentry
 
+import android.app.AlertDialog
 import android.app.DatePickerDialog
+import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -12,12 +14,17 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.example.gachajournal.R
 import com.example.gachajournal.data.JournalRepository
+import com.example.gachajournal.data.Reward
+import com.example.gachajournal.data.RewardGacha
 import com.example.gachajournal.data.database.AppDatabase
 import com.example.gachajournal.data.database.JournalEntry
 import com.example.gachajournal.databinding.FragmentNewEntryBinding
+import java.io.File
+import java.io.FileOutputStream
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
+import java.util.UUID
 
 class NewEntryFragment : Fragment() {
 
@@ -26,16 +33,30 @@ class NewEntryFragment : Fragment() {
 
     private var selectedGame: String? = null
     private var selectedDate: Calendar = Calendar.getInstance()
-    private var imageUri: String? = null
+    private var imagePath: String? = null
 
     private val viewModel: NewEntryViewModel by viewModels {
-        NewEntryViewModelFactory(JournalRepository(AppDatabase.getDatabase(requireContext()).journalEntryDao()))
+        val database = AppDatabase.getDatabase(requireContext())
+        NewEntryViewModelFactory(JournalRepository(database.journalEntryDao(), database.userDao()))
     }
 
     private val galleryLauncher = registerForActivityResult(ActivityResultContracts.GetContent()) {
-        it?.let {
-            binding.imagePreview.setImageURI(it)
-            imageUri = it.toString()
+        it?.let { uri ->
+            imagePath = saveImageToInternalStorage(uri)
+            binding.imagePreview.setImageURI(Uri.fromFile(File(imagePath)))
+        }
+    }
+
+    private fun saveImageToInternalStorage(uri: Uri): String? {
+        return try {
+            val inputStream = requireContext().contentResolver.openInputStream(uri)
+            val file = File(requireContext().filesDir, "${UUID.randomUUID()}.jpg")
+            val outputStream = FileOutputStream(file)
+            inputStream?.copyTo(outputStream)
+            file.absolutePath
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null
         }
     }
 
@@ -48,9 +69,35 @@ class NewEntryFragment : Fragment() {
 
         setupClickListeners()
         setupGameSelection()
-        updateDateInView(selectedDate) // Show current date initially
+        updateDateInView(selectedDate)
+
+        viewModel.reward.observe(viewLifecycleOwner) {
+            it?.let { showRewardDialog(it) }
+        }
+
+        viewModel.user.observe(viewLifecycleOwner) {
+            it?.let { user ->
+                val remaining4Star = RewardGacha.PITY_4_STAR - user.entriesSinceLast4Star
+                val remaining5Star = RewardGacha.PITY_5_STAR - user.entriesSinceLast5Star
+                binding.textPity4Star.text = "⭐⭐⭐⭐ (10%) Assegurat en $remaining4Star entrades"
+                binding.textPity5Star.text = "⭐⭐⭐⭐⭐ (1%) Assegurat en $remaining5Star entrades"
+            }
+        }
 
         return binding.root
+    }
+
+    private fun showRewardDialog(reward: Reward) {
+        val stars = "⭐".repeat(reward.rarity)
+        AlertDialog.Builder(requireContext())
+            .setTitle("Recompensa Obtinguda!")
+            .setMessage("$stars\n+ ${reward.points} GachaPoints")
+            .setPositiveButton("Genial!") { _, _ ->
+                viewModel.resetReward()
+                findNavController().popBackStack()
+            }
+            .setCancelable(false)
+            .show()
     }
 
     private fun setupClickListeners() {
@@ -76,13 +123,11 @@ class NewEntryFragment : Fragment() {
         val newEntry = JournalEntry(
             date = selectedDate.timeInMillis,
             game = selectedGame!!,
-            imageUri = imageUri,
+            imageUri = imagePath,
             description = description
         )
 
-        viewModel.insert(newEntry)
-        Toast.makeText(requireContext(), "Entrada desada!", Toast.LENGTH_SHORT).show()
-        findNavController().popBackStack()
+        viewModel.saveEntry(newEntry)
     }
 
     private fun setupGameSelection() {

@@ -1,5 +1,6 @@
 package com.example.gachajournal.ui.diary
 
+import android.app.AlertDialog
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -22,10 +23,13 @@ class DiaryFragment : Fragment() {
     private val binding get() = _binding!!
 
     private val viewModel: DiaryViewModel by viewModels {
-        DiaryViewModelFactory(JournalRepository(AppDatabase.getDatabase(requireContext()).journalEntryDao()))
+        val database = AppDatabase.getDatabase(requireContext())
+        DiaryViewModelFactory(JournalRepository(database.journalEntryDao(), database.userDao()))
     }
 
-    private val journalAdapter = JournalEntryAdapter()
+    private val journalAdapter = JournalEntryAdapter { entry -> 
+        showDeleteConfirmationDialog(entry)
+    }
     private var allEntries = emptyList<JournalEntry>()
 
     override fun onCreateView(
@@ -51,6 +55,17 @@ class DiaryFragment : Fragment() {
             updateCalendarEvents()
             updateEntriesForSelectedDate(binding.calendarView.selectedDates.firstOrNull())
         }
+    }
+    
+    private fun showDeleteConfirmationDialog(entry: JournalEntry) {
+        AlertDialog.Builder(requireContext())
+            .setTitle("Esborrar entrada")
+            .setMessage("Estàs segur que vols esborrar aquesta entrada?")
+            .setPositiveButton("Esborrar") { _, _ ->
+                viewModel.delete(entry)
+            }
+            .setNegativeButton("Cancel·lar", null)
+            .show()
     }
 
     private fun setupFilter() {

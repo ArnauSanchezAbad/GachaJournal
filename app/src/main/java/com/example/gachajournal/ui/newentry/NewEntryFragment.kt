@@ -2,6 +2,8 @@ package com.example.gachajournal.ui.newentry
 
 import android.app.AlertDialog
 import android.app.DatePickerDialog
+import android.content.res.ColorStateList
+import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -10,7 +12,9 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.example.gachajournal.R
 import com.example.gachajournal.data.JournalRepository
@@ -19,6 +23,9 @@ import com.example.gachajournal.data.RewardGacha
 import com.example.gachajournal.data.database.AppDatabase
 import com.example.gachajournal.data.database.JournalEntry
 import com.example.gachajournal.databinding.FragmentNewEntryBinding
+import com.example.gachajournal.ui.MainViewModel
+import com.example.gachajournal.ui.MainViewModelFactory
+import kotlinx.coroutines.launch
 import java.io.File
 import java.io.FileOutputStream
 import java.text.SimpleDateFormat
@@ -40,12 +47,20 @@ class NewEntryFragment : Fragment() {
         NewEntryViewModelFactory(JournalRepository(database.journalEntryDao(), database.userDao()))
     }
 
+    private val mainViewModel: MainViewModel by activityViewModels {
+        val database = AppDatabase.getDatabase(requireContext())
+        MainViewModelFactory(JournalRepository(database.journalEntryDao(), database.userDao()))
+    }
+
     private val galleryLauncher = registerForActivityResult(ActivityResultContracts.GetContent()) {
         it?.let { uri ->
             imagePath = saveImageToInternalStorage(uri)
             binding.imagePreview.setImageURI(Uri.fromFile(File(imagePath)))
         }
     }
+
+    // Store default colors
+    private var defaultTextColor: ColorStateList? = null
 
     private fun saveImageToInternalStorage(uri: Uri): String? {
         return try {
@@ -66,6 +81,13 @@ class NewEntryFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentNewEntryBinding.inflate(inflater, container, false)
+        // Save default colors once the view is created
+        defaultTextColor = binding.inputDate.textColors
+        return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
         setupClickListeners()
         setupGameSelection()
@@ -84,7 +106,25 @@ class NewEntryFragment : Fragment() {
             }
         }
 
-        return binding.root
+        viewLifecycleOwner.lifecycleScope.launch {
+            mainViewModel.appTheme.collect { theme ->
+                val color = try {
+                    theme.fontColor?.let { Color.parseColor(it) }
+                } catch (e: Exception) { null }
+
+                updateTextColor(color)
+            }
+        }
+    }
+
+    private fun updateTextColor(color: Int?) {
+        val colorStateList = if (color != null) ColorStateList.valueOf(color) else defaultTextColor
+        colorStateList?.let {
+            binding.textPity4Star.setTextColor(it)
+            binding.textPity5Star.setTextColor(it)
+            binding.inputDate.setTextColor(it)
+            binding.inputFeelings.setTextColor(it)
+        }
     }
 
     private fun showRewardDialog(reward: Reward) {

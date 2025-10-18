@@ -26,12 +26,15 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.gachajournal.data.CosmeticGacha
+import com.example.gachajournal.ui.AppTheme
 import kotlin.random.Random
 
 @Composable
-fun GachaScreen(viewModel: GachaViewModel) {
+fun GachaScreen(viewModel: GachaViewModel, theme: AppTheme) {
     val uiState by viewModel.uiState.collectAsState()
     val multiRollCost = SINGLE_ROLL_COST * 10
+
+    val fontColor = theme.fontColor?.let { Color(android.graphics.Color.parseColor(it)) } ?: Color.White
 
     Box(modifier = Modifier.fillMaxSize()) {
         StarryBackground()
@@ -45,13 +48,13 @@ fun GachaScreen(viewModel: GachaViewModel) {
         ) {
             Text(
                 text = "Gacha Points: ${uiState.user?.gachaPoints ?: 0}",
-                color = Color.White,
+                color = fontColor,
                 fontSize = 20.sp
             )
 
             Spacer(modifier = Modifier.height(32.dp))
 
-            GachaMachine(uiState = uiState)
+            GachaMachine(uiState = uiState, fontColor = fontColor)
 
             Spacer(modifier = Modifier.height(32.dp))
 
@@ -85,44 +88,44 @@ fun GachaScreen(viewModel: GachaViewModel) {
 
                 Spacer(modifier = Modifier.height(24.dp))
                 
-                PityInfo(uiState = uiState)
+                PityInfo(uiState = uiState, fontColor = fontColor)
             }
         }
     }
 }
 
 @Composable
-fun GachaMachine(uiState: GachaUiState) {
+fun GachaMachine(uiState: GachaUiState, fontColor: Color) {
     Box(modifier = Modifier.height(200.dp), contentAlignment = Alignment.Center) {
         if (uiState.isRolling) {
             CircularProgressIndicator()
         } else if (uiState.showResult) {
             uiState.result?.let {
-                Text(text = "Has aconseguit: ${it.name}", color = Color.White, fontSize = 22.sp)
-            } ?: Text(text = "Ja ho tens tot!", color = Color.White, fontSize = 18.sp)
+                Text(text = "Has aconseguit: ${it.name}", color = fontColor, fontSize = 22.sp)
+            } ?: Text(text = "Ja ho tens tot!", color = fontColor, fontSize = 18.sp)
         } else {
-            Text(text = "Prepara't per a la tirada!", color = Color.White, fontSize = 18.sp)
+            Text(text = "Prepara't per a la tirada!", color = fontColor, fontSize = 18.sp)
         }
     }
 }
 
 @Composable
-fun PityInfo(uiState: GachaUiState) {
+fun PityInfo(uiState: GachaUiState, fontColor: Color) {
     val user = uiState.user ?: return
 
     val remainingEpic = CosmeticGacha.PITY_EPIC - user.gachaRollsSinceLast4Star
     val remainingLegendary = CosmeticGacha.PITY_LEGENDARY - user.gachaRollsSinceLast5Star
 
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        Text("Recompensa Assegurada", color = Color.White, style = MaterialTheme.typography.titleMedium)
+        Text("Recompensa Assegurada", color = fontColor, style = MaterialTheme.typography.titleMedium)
         Spacer(modifier = Modifier.height(8.dp))
         Text(
             text = "⭐⭐⭐⭐ Èpic - Assegurat en $remainingEpic tirades",
-            color = Color.White
+            color = fontColor
         )
         Text(
             text = "⭐⭐⭐⭐⭐ Legendari - Assegurat en $remainingLegendary tirades",
-            color = Color.White
+            color = fontColor
         )
     }
 }

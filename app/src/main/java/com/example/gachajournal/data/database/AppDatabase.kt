@@ -9,7 +9,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-@Database(entities = [JournalEntry::class, User::class, Cosmetic::class, UserCosmeticCrossRef::class], version = 8, exportSchema = false)
+@Database(entities = [JournalEntry::class, User::class, Cosmetic::class, UserCosmeticCrossRef::class], version = 9, exportSchema = false)
 abstract class AppDatabase : RoomDatabase() {
 
     abstract fun journalEntryDao(): JournalEntryDao
@@ -49,8 +49,8 @@ abstract class AppDatabase : RoomDatabase() {
         }
 
         suspend fun seedDatabase(userDao: UserDao) {
-            // Add default user
-            userDao.insertUser(User(id = 1, gachaPoints = 10000))
+            // Add default user with 0 points
+            userDao.insertUser(User(id = 1, gachaPoints = 0))
 
             // Add cosmetics
             val cosmetics = listOf(

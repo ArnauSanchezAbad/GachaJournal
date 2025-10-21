@@ -7,31 +7,31 @@
 
     <fragment
         android:id="@+id/navigation_diary"
-        android:name="com.example.gachajournal.ui.diary.DiaryFragment"
+        android:name="com.udg.gachajournal.ui.diary.DiaryFragment"
         android:label="@string/title_diary"
         tools:layout="@layout/fragment_diary" />
 
     <fragment
         android:id="@+id/navigation_gacha"
-        android:name="com.example.gachajournal.ui.gacha.GachaFragment"
+        android:name="com.udg.gachajournal.ui.gacha.GachaFragment"
         android:label="@string/title_gacha"
         tools:layout="@layout/fragment_gacha" />
 
     <fragment
         android:id="@+id/navigation_shop"
-        android:name="com.example.gachajournal.ui.shop.ShopFragment"
+        android:name="com.udg.gachajournal.ui.shop.ShopFragment"
         android:label="@string/title_shop"
         tools:layout="@layout/fragment_shop" />
 
     <fragment
         android:id="@+id/navigation_profile"
-        android:name="com.example.gachajournal.ui.profile.ProfileFragment"
+        android:name="com.udg.gachajournal.ui.profile.ProfileFragment"
         android:label="@string/title_profile"
         tools:layout="@layout/fragment_profile" />
 
     <fragment
         android:id="@+id/navigation_new_entry"
-        android:name="com.example.gachajournal.ui.newentry.NewEntryFragment"
+        android:name="com.udg.gachajournal.ui.newentry.NewEntryFragment"
         android:label="@string/title_new_entry"
         tools:layout="@layout/fragment_new_entry" />
 
